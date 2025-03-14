@@ -1,0 +1,12 @@
+github:
+  search_keywords:
+    - "AI agent"
+    - "autonomous agent"
+    - "LLM agent"
+    - "AI assistant framework"
+  min_stars: 10
+  max_pages: 5
+
+storage:
+  format: "json"  # "json" or "csv"
+  data_dir: "data"
