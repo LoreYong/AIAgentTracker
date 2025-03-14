@@ -98,6 +98,97 @@ def run_tracker(config_path=None, save_format=None):
         logger.error("Failed to save repository data")
         return False
 
+# 在现有main.py基础上添加/修改以下内容
+
+def generate_readme(data_path=None):
+    """
+    生成项目README.md，展示项目数据
+    
+    Args:
+        data_path (str): 数据文件路径
+        
+    Returns:
+        bool: 是否成功生成
+    """
+    logger.info("生成项目展示页面")
+    
+    # 使用FileStorage加载最新数据
+    storage = FileStorage(data_dir="data")
+    repos = storage.load_latest() if not data_path else storage.load_json(os.path.basename(data_path))
+    
+    if not repos:
+        logger.error("无数据可用于生成README")
+        return False
+    
+    # 准备README内容
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    readme_content = f"""# AI Agent 项目追踪器
+
+> 最后更新于: {timestamp}
+
+此仓库自动追踪GitHub上与AI Agent相关的开源项目，并按照星标数量排序展示。
+
+## 热门项目排行榜
+
+| # | 项目名称 | 描述 | 星标 ⭐ | 最后更新 |
+|---|---------|------|--------|---------|
+"""
+    
+    # 添加前20个项目
+    for i, repo in enumerate(repos[:20], 1):
+        name = repo.get("full_name", "")
+        description = repo.get("description", "").replace("|", "/")
+        if len(description) > 80:
+            description = description[:77] + "..."
+        
+        stars = repo.get("stars", 0)
+        last_updated = repo.get("last_updated", "").split("T")[0]
+        
+        readme_content += f"| {i} | [{name}]({repo.get('url', '')}) | {description} | {stars} | {last_updated} |\n"
+    
+    # 添加项目统计信息
+    total_repos = len(repos)
+    total_stars = sum(repo.get("stars", 0) for repo in repos)
+    
+    readme_content += f"""
+## 项目统计
+
+- 跟踪的项目总数: **{total_repos}**
+- 总星标数: **{total_stars}**
+- 平均每个项目星标数: **{total_stars / total_repos:.1f}**
+
+## 关于本项目
+
+AIAgentTracker 是一个自动化工具，每天从GitHub获取与AI Agent相关的开源项目信息，并按照流行度进行排序。
+
+项目会每日自动更新。如果想要添加您的项目到追踪列表中，请确保它包含"ai-agent"、"AI agent"等相关标签或描述。
+"""
+    
+    # 写入README.md文件
+    try:
+        with open("README.md", 'w', encoding='utf-8') as f:
+            f.write(readme_content)
+        logger.info("已成功生成 README.md")
+        return True
+    except Exception as e:
+        logger.error(f"生成README.md时出错: {str(e)}")
+        return False
+
+def run_tracker(config_path=None, save_format=None, update_readme=True):
+    """Run the AI Agent tracking process"""
+    # 现有代码保持不变
+    # [...]
+    
+    # 在函数末尾添加:
+    if file_path and update_readme:
+        # 生成README
+        if generate_readme(file_path):
+            logger.info("已更新项目展示页面")
+    
+    return True
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Track AI Agent repositories on GitHub")
     parser.add_argument("--config", help="Path to configuration file")

@@ -10,3 +10,16 @@ github:
 storage:
   format: "json"  # "json" or "csv"
   data_dir: "data"
+
+
+# 代理配置设置
+proxy:
+  enabled: false  # 设置为 true 以启用代理
+  http: "http://localhost:7890"  # HTTP 代理服务器地址
+  https: "http://localhost:7890"  # HTTPS 代理服务器地址
+  no_proxy: "localhost,127.0.0.1"  # 不使用代理的地址列表
+
+# SSL 连接选项
+ssl:
+  verify: true  # 是否验证 SSL 证书（仅在特殊情况下设置为 false）
+  cert_path: ""  # 自定义证书路径（留空使用系统默认）

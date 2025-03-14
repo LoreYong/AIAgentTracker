@@ -1,0 +1,8 @@
+proxy:
+  enabled: true
+  http: http://localhost:7890
+  https: http://localhost:7890
+  no_proxy: localhost,127.0.0.1
+ssl:
+  cert_path: ''
+  verify: true
